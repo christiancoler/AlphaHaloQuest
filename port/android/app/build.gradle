@@ -1,0 +1,122 @@
+plugins {
+    id "com.android.application"
+}
+
+configurations {
+    openxrNative
+}
+
+// build/android in the repository root, where `ninja android` stages the
+// native libraries (jniLibs) and the guest image (assets)
+def staged = new File(rootDir, "../../build/android")
+
+// a build of main knows its number (tools/ci_build.py), which names its
+// release and which the self-updater (Updater.java) compares; others have
+// none and never look for updates
+def buildNumberText = System.getenv("HALO_BUILD_NUMBER") ?: "18"
+def buildNumber = buildNumberText.isInteger() ? buildNumberText.toInteger() : 0
+
+// the workflow's signing key (.github/workflows/build.yml): every build of
+// main signed with it can install over the one before; without it, the
+// debug key of the computer that builds
+def signingKey = System.getenv("HALO_ANDROID_KEYSTORE")
+
+android {
+    namespace "com.halo.decomp"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.halo.questvr"
+        minSdk 28
+        targetSdk 35
+        versionCode Math.max(1, buildNumber)
+        versionName buildNumber > 0 ? "build " + buildNumber : "1.0"
+        buildConfigField "int", "HALO_BUILD_NUMBER", "${buildNumber}"
+        ndk {
+            abiFilters "arm64-v8a"
+        }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += new File(staged, "third_party/SDL3/android-project/app/src/main/java")
+            jniLibs.srcDirs = [new File(staged, "jniLibs")]
+            assets.srcDirs = [
+                new File(staged, "assets"),
+                // The on-device XDVDFS extractor follows extract-xiso. Its
+                // license requires binary distributions to carry this notice.
+                new File(rootDir, "../third_party/extract-xiso")
+            ]
+        }
+    }
+
+    // the guest image is read straight from the APK
+    androidResources {
+        noCompress += ["elf"]
+    }
+
+    packaging {
+        jniLibs {
+            // Compress native libraries inside sideload builds. Quest extracts
+            // them at install time; this makes the APK small enough to pass
+            // reliably through mobile download/file bridges.
+            useLegacyPackaging true
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        if (signingKey) {
+            halo {
+                storeFile file(signingKey)
+                storePassword System.getenv("HALO_ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("HALO_ANDROID_KEY_ALIAS") ?: "halo"
+                keyPassword System.getenv("HALO_ANDROID_KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            signingConfig signingKey ? signingConfigs.halo : signingConfigs.debug
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingKey ? signingConfigs.halo : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Official Khronos Android loader. Native code resolves it dynamically so
+    // the flat Android fallback still starts when no OpenXR runtime exists.
+    implementation "org.khronos.openxr:openxr_loader_for_android:1.0.34"
+    openxrNative "org.khronos.openxr:openxr_loader_for_android:1.0.34"
+}
+
+// The Khronos AAR exposes its native loader through Prefab. This project does
+// not use Gradle's CMake integration, so explicitly stage the arm64 library
+// beside libmain.so and SDL3 for packaging.
+def stageOpenXrLoader = tasks.register("stageOpenXrLoader", Copy) {
+    from {
+        configurations.openxrNative.collect { zipTree(it) }
+    }
+    include "prefab/modules/openxr_loader/libs/android.arm64-v8a/libopenxr_loader.so"
+    eachFile { details -> details.path = details.name }
+    includeEmptyDirs = false
+    into new File(staged, "jniLibs/arm64-v8a")
+}
+
+tasks.named("preBuild").configure {
+    dependsOn stageOpenXrLoader
+}
