@@ -126,6 +126,7 @@ vertical controller swing triggers melee.
   been comprehensively tested.
 - Lots of general jank
 - Probably a ton of undiscovered stuff, as at this point I've mostly only been playing the first few minutes of the Halo level for testing
+- Had a weird issue at one point where the imported data from the Xbox disc image seemingly got corrupted and maps wouldn't load. unsure if this is a common issue, only happened to me once, but on the menu before opening the game I've added the ability to reload the disc data, just in case. This won't affect your game data. if you try to start a map and you see a purplish screen, try reopening and re-importing disc data.
 
 ## Resolution
 
