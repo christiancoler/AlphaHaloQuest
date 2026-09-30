@@ -172,8 +172,8 @@ Without those secrets, each CI environment uses its own debug signing key.
 ## HaloCEVR
 
 [HaloCEVR](https://github.com/LivingFray/HaloCEVR), the VR mod for the Halo CE PC port, informed this project's
-feature set, control ideas, bone names, and several default thresholds for
-the Quest implementation. That being said, per the creator's wishes to keep the mod VR only, this contains no HaloCEVR source, assets, etc.
+feature set, control ideas, and several default thresholds for
+the Quest implementation. That being said, per the creator's wishes to keep the mod VR only, this contains no HaloCEVR source, assets, etc. it was referenced during creation, but not recreated or forked.
 
 This repository does not include HaloCEVR source files, binaries, shaders, or
 assets. The Quest code is a separate OpenXR implementation built into the
