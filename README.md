@@ -38,7 +38,7 @@ Working now:
 - separate tracked views for both eyes;
 - Quest Touch buttons, sticks, triggers, grips, poses, and haptics;
 - controller-directed weapon and grenade aiming;
-- tracked first-person weapon model;
+- tracked first-person weapon model. Added some smoothing (maybe too much smoothing?);
 - experimental two-hand weapon support;
 - physical melee, flashlight, and crouch gestures;
 - a tracked weapon reticle outside weapon zoom;
