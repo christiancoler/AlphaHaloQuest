@@ -124,6 +124,8 @@ vertical controller swing triggers melee.
 - Movement direction and snap turning need more headset testing.
 - Campaign progression, vehicles, cinematics, menus, and checkpoints have not
   been comprehensively tested.
+- Lots of general jank
+- Probably a ton of undiscovered stuff, as at this point I've mostly only been playing the first few minutes of the Halo level for testing
 
 ## Resolution
 
@@ -167,12 +169,11 @@ keystore as the `ANDROID_KEYSTORE_BASE64` secret and its password as
 `ANDROID_KEYSTORE_PASSWORD` if release APKs must install over one another.
 Without those secrets, each CI environment uses its own debug signing key.
 
-## HaloCEVR relationship
+## HaloCEVR
 
-[HaloCEVR](https://github.com/LivingFray/HaloCEVR) showed how the 2003 PC game
-could work in VR and was used as a behavior reference for this project. Its
-feature set, control ideas, bone names, and several default thresholds informed
-the Quest implementation.
+[HaloCEVR](https://github.com/LivingFray/HaloCEVR), the VR mod for the Halo CE PC port, informed this project's
+feature set, control ideas, bone names, and several default thresholds for
+the Quest implementation. That being said, per the creator's wishes to keep the mod VR only, this contains no HaloCEVR source, assets, etc.
 
 This repository does not include HaloCEVR source files, binaries, shaders, or
 assets. The Quest code is a separate OpenXR implementation built into the
@@ -180,10 +181,7 @@ decompiled Xbox engine; it does not use HaloCEVR's Direct3D hooks or SteamVR
 runtime. This was not a clean-room implementation, because HaloCEVR's source
 was read during development.
 
-HaloCEVR's README asks that the mod remain on PC. This project is independent
-and is not endorsed by the HaloCEVR author. Please keep discussion and bug
-reports for this port in this repository rather than sending them to the
-HaloCEVR project.
+HaloCEVR's README asks that the mod remain on PC. This project is independent and entirely unrelated
 
 ## Licensing and trademarks
 
@@ -191,6 +189,5 @@ The inherited source tree is released under CC0; see [LICENSE.md](LICENSE.md).
 Third-party components keep their own licenses in their source directories.
 The Khronos OpenXR headers are Apache-2.0 licensed.
 
-Halo and related names and assets belong to their respective owners. This is
-an unofficial preservation and compatibility project. No Microsoft or Halo
+No Microsoft or Halo
 retail content is distributed here.
